@@ -29,17 +29,16 @@ public class ShippingApplication {
         return String.format("Hello %s!", name);
     }
 
-    @GetMapping("/hello")
-    public String hello(@RequestParam(value = "name", defaultValue = "from user service") String name) {
+    @GetMapping("/shippinginfo")
+    public String shippinginfo() {
+        String info = "{\"shippingId\":\"53179\",\"date\":\"10/10/2020\",";
+        String token = "";
         try {
-            URL url = new URL("http://localhost:8080/hello");
+            URL url = new URL("http://localhost:8082/token");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestProperty ("Authorization", "Bearer testtoken");
             con.setRequestMethod("GET");
             con.setRequestProperty("Content-Type", "application/json");
             int status = con.getResponseCode();
-            if(status == 401)
-                return status + " Unauthorized";
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
             String inputLine;
@@ -49,7 +48,33 @@ public class ShippingApplication {
             }
             in.close();
             con.disconnect();
-            return String.format("Hello %s!", name + content);
+            token = content.toString();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(ShippingApplication.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ShippingApplication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+            URL url = new URL("http://localhost:8080/productinfo");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestProperty("Authorization", "Bearer " + token);
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Content-Type", "application/json");
+            int status = con.getResponseCode();
+            if (status == 401) {
+                return status + " Unauthorized";
+            }
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+            return info + content.toString();
         } catch (MalformedURLException ex) {
             Logger.getLogger(ShippingApplication.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

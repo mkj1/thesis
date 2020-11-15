@@ -6,8 +6,10 @@ import java.util.logging.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @SpringBootApplication
 @RestController
@@ -20,12 +22,12 @@ public class TokenserviceApplication {
     }
 
     @GetMapping("/token")
-    public String token(@RequestParam(value = "name", defaultValue = "from token service") String name) {
+    public String token() {
         return manager.getToken();
     }
 
     @GetMapping("/check")
-    public boolean check(@RequestParam(value = "name", defaultValue = "tokentest") String name) {
-        return manager.checkToken(name);
+    public boolean check(@RequestHeader("Authorization") String token) {
+        return manager.checkToken(token);
     }
 }

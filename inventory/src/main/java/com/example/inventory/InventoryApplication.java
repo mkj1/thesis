@@ -18,6 +18,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 @SpringBootApplication
 @RestController
@@ -27,9 +37,15 @@ public class InventoryApplication {
         SpringApplication.run(InventoryApplication.class, args);
     }
 
-    @GetMapping("/hello")
-    public ResponseEntity<?> hello(@RequestParam(value = "name", defaultValue = "from demo service") String name, @RequestHeader("Authorization") String token) {
-
+    @GetMapping("/productinfo")
+    public ResponseEntity<?> productinfo(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        try {
+            var parsed = parseJwt(token);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException | io.jsonwebtoken.security.SignatureException ex) {
+            Logger.getLogger(InventoryApplication.class.getName()).log(Level.SEVERE, null, ex);
+            return new ResponseEntity<String>("Unauthorized " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
         try {
             URL url = new URL("http://localhost:8082/check");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -47,11 +63,12 @@ public class InventoryApplication {
             in.close();
             con.disconnect();
             boolean ret = parseBoolean(content.toString());
-            if(ret)
-                return new ResponseEntity<String>("OK", HttpStatus.OK);
-            else
+            if (ret) {
+                return new ResponseEntity<String>("\"products\":\"50\"}", HttpStatus.OK);
+            } else {
                 return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
-            
+            }
+
         } catch (MalformedURLException ex) {
             Logger.getLogger(InventoryApplication.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -59,6 +76,39 @@ public class InventoryApplication {
         }
 
         return new ResponseEntity<String>("Unable to reach token service", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //function taken from https://www.viralpatel.net/java-create-validate-jwt-token/
+    public static Jws<Claims> parseJwt(String jwtString) throws InvalidKeySpecException, NoSuchAlgorithmException {
+
+        PublicKey publicKey = getPublicKey();
+
+        Jws<Claims> jwt = Jwts.parserBuilder()
+                .setSigningKey(publicKey)
+                .build()
+                .parseClaimsJws(jwtString);
+
+        return jwt;
+    }
+
+    //function taken from https://www.viralpatel.net/java-create-validate-jwt-token/
+    //hardcoded key for demonstration purpose
+    private static PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+        String rsaPublicKey = "-----BEGIN PUBLIC KEY-----"
+                + "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyu3NB7Tr3nzETLNbZHYi"
+                + "ZvgNeg3/OZUJZl40LzBzYGOD/8575eJETjfQ3QXaNyvNThu6Uf9B/V73QUxKI4/+"
+                + "rwlbjA3niIga4MdDiY4b9K/KFA+HedvtZF1yE2p4smXGydPLOLBe31EgriGTob78"
+                + "EE3f7SMFxlNaqn4Pm7KJkOodnMz0ilwLseeL1IkTtiFn/2OrcMpPHMtTxyDn3pQl"
+                + "VCeJM5j/grDh+0YdyTMGdDHOBgM53VqSsDVyo1TNtP2yhPRYCIiI85hEHVaUnVM9"
+                + "jGwCjNZLJHWh10Mrmh6B3z8BEmLhMAZXeL4fQBjBd42DLvIIJwM1USKFhjK+XghN"
+                + "rQIDAQAB"
+                + "-----END PUBLIC KEY-----";
+        rsaPublicKey = rsaPublicKey.replace("-----BEGIN PUBLIC KEY-----", "");
+        rsaPublicKey = rsaPublicKey.replace("-----END PUBLIC KEY-----", "");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(rsaPublicKey));
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = kf.generatePublic(keySpec);
+        return publicKey;
     }
 
 }

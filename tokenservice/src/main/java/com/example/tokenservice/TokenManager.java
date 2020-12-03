@@ -38,7 +38,7 @@ public class TokenManager {
         return token;
     }
 
-    public boolean checkToken(String token) {
+    public boolean validateToken(String token) {
         if (!isRevoked(token)) {
             revokeToken(token);
             return true;
@@ -55,6 +55,7 @@ public class TokenManager {
         return revokedTokens.add(token);
     }
 
+    //example from https://www.viralpatel.net/java-create-validate-jwt-token/
     public static String createJwtSigned() throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         PrivateKey privateKey = getPrivateKey();
@@ -73,6 +74,7 @@ public class TokenManager {
         return jwtToken;
     }
 
+    //example from https://www.viralpatel.net/java-create-validate-jwt-token/
     private static PrivateKey getPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         String rsaPrivateKey = "-----BEGIN PRIVATE KEY-----"
                 + "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDK7c0HtOvefMRM"

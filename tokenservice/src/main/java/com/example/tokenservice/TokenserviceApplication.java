@@ -28,6 +28,6 @@ public class TokenserviceApplication {
 
     @GetMapping("/check")
     public boolean check(@RequestHeader("Authorization") String token) {
-        return manager.checkToken(token);
+        return manager.validateToken(token);
     }
 }

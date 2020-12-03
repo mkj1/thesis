@@ -78,7 +78,7 @@ public class InventoryApplication {
         return new ResponseEntity<String>("Unable to reach token service", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    //function taken from https://www.viralpatel.net/java-create-validate-jwt-token/
+    //example from https://www.viralpatel.net/java-create-validate-jwt-token/
     public static Jws<Claims> parseJwt(String jwtString) throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         PublicKey publicKey = getPublicKey();
@@ -91,7 +91,7 @@ public class InventoryApplication {
         return jwt;
     }
 
-    //function taken from https://www.viralpatel.net/java-create-validate-jwt-token/
+    //example from https://www.viralpatel.net/java-create-validate-jwt-token/
     //hardcoded key for demonstration purpose
     private static PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         String rsaPublicKey = "-----BEGIN PUBLIC KEY-----"

@@ -1,0 +1,7 @@
+com\manning\mss\ch03\sample03\oauth2\server\UserDetailsServiceImpl.class
+com\manning\mss\ch03\sample03\oauth2\server\JsonToUrlEncodedFilter$RequestWrapper.class
+com\manning\mss\ch03\sample03\oauth2\server\User.class
+com\manning\mss\ch03\sample03\oauth2\server\JsonToUrlEncodedFilter.class
+com\manning\mss\ch03\sample03\oauth2\server\OAuthServerConfig.class
+com\manning\mss\ch03\sample03\oauth2\server\WebSecurityConfig.class
+com\manning\mss\ch03\sample03\oauth2\server\OAuthServerApplication.class

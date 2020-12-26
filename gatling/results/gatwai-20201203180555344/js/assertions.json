@@ -1,0 +1,10 @@
+{
+  "simulation": "gatwai",
+  "simulationId": "gatwai",
+  "start": 1607018755344,
+  "description": "5ps5",
+  "scenarios": ["gatwai"],
+  "assertions": [
+
+  ]
+}
